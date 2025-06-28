@@ -3,7 +3,7 @@ pipeline {
         label "docker-agent"   
     }
     options {
-        timeout(time: 20, unit: 'minutes')
+        timeout(time: 1, unit: 'HOURS')
         buildDiscarder(logRotator(numToKeepStr: '1')) 
     }
     stages {
