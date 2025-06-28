@@ -1,0 +1,20 @@
+pipeline {
+    agent {
+        label "docker-agent"
+    }
+
+    stages {
+      stage("App Code Checkout"){
+        steps{ 
+          git branch:'master', url:'https://github.com/prateekkumawat/jenkins-weekend-repo.git'
+        }
+      }  
+
+      stage("Build Docker Image") {
+        steps {
+            sh 'docker build -t spring:v1 . ' 
+        }  
+      }
+    }
+
+}
