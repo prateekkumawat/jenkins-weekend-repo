@@ -1,8 +1,11 @@
 pipeline {
     agent {
-        label "docker-agent"
+        label "docker-agent"   
     }
-
+    options {
+        timeout(time: 20, unit: 'minutes')
+        buildDiscarder(logRotator(numToKeepStr: '1')) 
+    }
     stages {
       stage("App Code Checkout"){
         steps{ 
