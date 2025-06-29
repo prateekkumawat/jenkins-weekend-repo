@@ -10,6 +10,7 @@ pipeline {
         string(name: 'Branch', defaultValue: 'master', description: 'GitHub Branch Name')
         string(name: 'ImageName', defaultValue: 'sample', description: 'Provide Docker Image Name')
         string(name: 'ImageTag', defaultValue: 'latest', description: 'Docker ImageTag')
+        string(name: 'Container_name', defaultValue: 'springapp')
     }
     stages {
       stage("App Code Checkout"){
@@ -21,6 +22,12 @@ pipeline {
       stage("Build Docker Image") {
         steps {
             sh "docker build -t ${params.ImageName}:${params.ImageTag} . " 
+        }  
+      }
+
+      stage("Build Container") {
+        steps {
+            sh "docker run -dit --name ${params.Container_name} -p 8089:8080  ${params.ImageName}:${params.ImageTag} " 
         }  
       }
     }
