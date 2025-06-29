@@ -6,16 +6,21 @@ pipeline {
         timeout(time: 1, unit: 'HOURS')
         buildDiscarder(logRotator(numToKeepStr: '1')) 
     }
+    parameters {
+        string(name: 'Branch', defaultValue: 'master', description: 'GitHub Branch Name'))
+        string(name: 'ImageName', defaultValue: 'sample', description: 'Provide Docker Image Name')
+        string(name: 'ImageTag', defaultValue: 'latest', description: 'Docker ImageTag')
+    }
     stages {
       stage("App Code Checkout"){
         steps{ 
-          git branch:'master', url:'https://github.com/prateekkumawat/jenkins-weekend-repo.git'
+          git branch:'${params.Branch}', url:'https://github.com/prateekkumawat/jenkins-weekend-repo.git'
         }
       }  
 
       stage("Build Docker Image") {
         steps {
-            sh 'docker build -t spring:v1 . ' 
+            sh 'docker build -t ${params.ImageName}:${params.ImageTag} . ' 
         }  
       }
     }
