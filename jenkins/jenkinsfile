@@ -7,7 +7,7 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '1')) 
     }
     parameters {
-        string(name: 'Branch', defaultValue: 'master', description: 'GitHub Branch Name'))
+        string(name: 'Branch', defaultValue: 'master', description: 'GitHub Branch Name')
         string(name: 'ImageName', defaultValue: 'sample', description: 'Provide Docker Image Name')
         string(name: 'ImageTag', defaultValue: 'latest', description: 'Docker ImageTag')
     }
