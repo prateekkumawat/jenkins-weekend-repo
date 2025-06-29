@@ -14,7 +14,7 @@ pipeline {
     stages {
       stage("App Code Checkout"){
         steps{ 
-          git branch: ${params.Branch}, url:'https://github.com/prateekkumawat/jenkins-weekend-repo.git'
+          git branch: "${params.Branch}", url:'https://github.com/prateekkumawat/jenkins-weekend-repo.git'
         }
       }  
 
