@@ -10,7 +10,9 @@ pipeline {
         string(name: 'Branch', defaultValue: 'master', description: 'GitHub Branch Name')
         string(name: 'ImageName', defaultValue: 'sample', description: 'Provide Docker Image Name')
         string(name: 'ImageTag', defaultValue: 'latest', description: 'Docker ImageTag')
-        string(name: 'Container_name', defaultValue: 'springapp')
+    }
+    environment {
+       SCANNER_HOME=tool 'sonar-scanner'
     }
     stages {
       stage("App Code Checkout"){
@@ -18,18 +20,28 @@ pipeline {
           git branch: "${params.Branch}", url:'https://github.com/prateekkumawat/jenkins-weekend-repo.git'
         }
       }  
-
+      stage('Sonar Analysis') { 
+        steps {
+          dir('app/'){
+            withSonarQubeEnv('sonar-server'){
+                sh ''' $SCANNER_HOME/bin/sonar-scanner \
+                      -Dsonar.projectName=docker-spring-image-builder \
+                      -Dsonar.projectKey=docker-spring-image-builder '''
+            }
+          }
+        }
+      }
+      stage('Quality gate') {
+        steps {
+          script {
+            waitForQualityGate abortPipeline: false, credentialsId: 'sonar-server-token'
+          }
+        }
+      }
       stage("Build Docker Image") {
         steps {
             sh "docker build -t ${params.ImageName}:${params.ImageTag} . " 
         }  
       }
-
-      stage("Build Container") {
-        steps {
-            sh "docker run -dit --name ${params.Container_name} -p 8089:8080  ${params.ImageName}:${params.ImageTag} " 
-        }  
-      }
     }
-
 }
