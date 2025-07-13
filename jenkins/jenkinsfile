@@ -10,7 +10,7 @@ pipeline {
         }
         stage("Image Create"){
             steps {
-                sh "docker image build -t app:ubi"
+                sh " docker image build -t app:ubi . "
             }
         }
         stage("Deploy container"){
