@@ -1,0 +1,6 @@
+services: 
+  app: 
+    image: app:ubi
+    container_name: app 
+    ports:
+    - 801:80

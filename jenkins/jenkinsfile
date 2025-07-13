@@ -1,0 +1,23 @@
+pipeline {
+    agent {
+        label: 'cimachine'
+    }
+
+    stages{
+        stage("AppCode Checkout"){
+            steps{
+                git branch:'learning-app-jenkins' url:'https://github.com/prateekkumawat/jenkins-weekend-repo.git'
+            }
+        }
+        stage("Image Create"){
+            steps {
+                sh "docker image build -t app:ubi"
+            }
+        }
+        stage("Deploy container"){
+            steps{
+                sh "docker-compose up -d "
+            }
+        }
+    }
+}
