@@ -6,7 +6,7 @@ pipeline {
     stages{
         stage("AppCode Checkout"){
             steps{
-                git branch:'learning-app-jenkins' url:'https://github.com/prateekkumawat/jenkins-weekend-repo.git'
+                git branch:'learning-app-jenkins', url:'https://github.com/prateekkumawat/jenkins-weekend-repo.git'
             }
         }
         stage("Image Create"){
