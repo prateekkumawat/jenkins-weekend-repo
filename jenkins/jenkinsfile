@@ -8,9 +8,18 @@ pipeline {
                 git branch:'learning-app-jenkins', url:'https://github.com/prateekkumawat/jenkins-weekend-repo.git'
             }
         }
-        stage("Image Create"){
+        stage("AppImage Create"){
             steps {
-                sh " docker image build -t app:ubi . "
+                dir("/web1"){ 
+                  sh " docker image build -t app:ubi . "
+                }
+            }
+        }
+          stage("VillaImage Create"){
+            steps {
+                dir("/web2"){ 
+                  sh " docker image build -t villa:ubi . "
+                }
             }
         }
         stage("Deploy container"){

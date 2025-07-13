@@ -4,3 +4,8 @@ services:
     container_name: app 
     ports:
     - 801:80
+  villa: 
+    image: villa:ubi
+    container_name: villa 
+    ports:
+    - 802:80  
