@@ -1,7 +1,7 @@
 FROM redhat/ubi9:latest 
 
 # Install packages of httpd server 
-yum install httpd -y 
+RUN yum install httpd -y 
 
 # copy source code in /var/www/html 
 COPY src/  /var/www/html 
