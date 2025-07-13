@@ -1,8 +1,7 @@
 pipeline {
     agent {
-        label: 'cimachine'
+        label 'cimachine'
     }
-
     stages{
         stage("AppCode Checkout"){
             steps{
