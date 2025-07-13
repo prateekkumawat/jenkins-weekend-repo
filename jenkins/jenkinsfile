@@ -10,14 +10,14 @@ pipeline {
         }
         stage("AppImage Create"){
             steps {
-                dir("/web1"){ 
+                dir("web1/"){ 
                   sh " docker image build -t app:ubi . "
                 }
             }
         }
           stage("VillaImage Create"){
             steps {
-                dir("/web2"){ 
+                dir("web2/"){ 
                   sh " docker image build -t villa:ubi . "
                 }
             }
