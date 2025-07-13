@@ -1,11 +1,13 @@
-FROM python:3.11-slim
+FROM redhat/ubi9:latest 
 
-WORKDIR /app
+# Install packages of httpd server 
+yum install httpd -y 
 
-COPY app/requirements.txt .
+# copy source code in /var/www/html 
+COPY src/  /var/www/html 
 
-RUN pip install --no-cache-dir -r requirements.txt
+# Default running port 
+EXPOSE 80 
 
-COPY app/ .
-
-CMD ["python", "app.py"]
+# start httpd service 
+CMD ["/usr/sbin/httpd", "-DFOREGROUND"]
