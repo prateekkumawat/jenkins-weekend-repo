@@ -45,7 +45,7 @@ pipeline {
       }
       stage("Vanulabtites Security Scanning"){
         steps {
-            sh " trivy image -q ${params.ImageName}:${params.ImageTag} >> /tmp/triyscan.txt"
+            sh " trivy -q image ${params.ImageName}:${params.ImageTag} >> /tmp/triyscan.txt"
         }
       }
     }
