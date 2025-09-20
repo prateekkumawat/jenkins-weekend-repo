@@ -62,7 +62,7 @@ pipeline {
                         nexusUrl: '13.233.125.54:8081',
                         groupId: 'com.example',
                         version: '0.0.2-SNAPSHOT',
-                        repository: 'maven-releases',
+                        repository: 'maven-snapshots',
                         credentialsId: 'nexus',
                         artifacts: [
                             [artifactId: 'demo',
