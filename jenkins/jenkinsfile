@@ -59,10 +59,10 @@ pipeline {
                     nexusArtifactUploader (
                         nexusVersion: 'nexus3',
                         protocol: 'http',
-                        nexusUrl: 'http://13.233.125.54:8081/repository/maven-releases/',
+                        nexusUrl: '13.233.125.54:8081',
                         groupId: 'com.example',
                         version: '0.0.2-SNAPSHOT',
-                        repository: 'nexus-releases',
+                        repository: 'maven-releases',
                         credentialsId: 'nexus',
                         artifacts: [
                             [artifactId: 'demo',
