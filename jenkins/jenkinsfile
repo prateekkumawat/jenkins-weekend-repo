@@ -44,6 +44,15 @@ pipeline {
             }
         }
         
+         stage("MavenBuild"){
+            steps{
+                dir('/springapp'){
+                    sh 'mvn clean package'
+                }
+
+            }
+        }
+
         stage("Artifacts Upload"){
             steps{
                 nexusArtifactUploader (
