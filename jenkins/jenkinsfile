@@ -55,7 +55,7 @@ pipeline {
                     repository: 'nexus-releases',
                     credentialsId: 'nexus',
                     artifacts: [
-                        [artifactId: demo,
+                        [artifactId: 'demo',
                         classifier: '',
                         file: 'demo' + version + '.jar',
                         type: 'jar']
