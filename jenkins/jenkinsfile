@@ -57,7 +57,7 @@ pipeline {
                     artifacts: [
                         [artifactId: 'demo',
                         classifier: '',
-                        file: 'demo' + version + '.jar',
+                        file: "demo-0.0.2-SNAPSHOT.jar",
                         type: 'jar']
                     ]    
                 )    
