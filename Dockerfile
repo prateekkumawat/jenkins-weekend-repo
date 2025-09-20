@@ -14,7 +14,7 @@ RUN mvn clean package -DskipTests
 FROM openjdk:17-jdk-slim
 
 # Copy built jar from builder stage
-COPY --from=builder /app/target/demo-0.0.2-SNAPSHOT.jar app.jar
+COPY --from=builder /app/target/demo-0.0.3-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
 

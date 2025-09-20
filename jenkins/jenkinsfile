@@ -61,13 +61,13 @@ pipeline {
                         protocol: 'http',
                         nexusUrl: '13.233.125.54:8081',
                         groupId: 'com.example',
-                        version: '0.0.2-SNAPSHOT',
+                        version: '0.0.3-SNAPSHOT',
                         repository: 'maven-snapshots',
                         credentialsId: 'nexus',
                         artifacts: [
                             [artifactId: 'demo',
                             classifier: '',
-                            file: "target/demo-0.0.2-SNAPSHOT.jar",
+                            file: "target/demo-0.0.3-SNAPSHOT.jar",
                             type: 'jar']
                         ]    
                     )
