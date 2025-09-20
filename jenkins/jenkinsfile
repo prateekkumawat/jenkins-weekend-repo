@@ -46,7 +46,7 @@ pipeline {
         
          stage("MavenBuild"){
             steps{
-                dir('/springapp'){
+                dir('springapp/'){
                     sh 'mvn clean package'
                 }
 
