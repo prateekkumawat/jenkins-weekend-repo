@@ -1,52 +1,86 @@
 pipeline {
     agent {
-        label "cimachine"   
+        label 'build'
+    } 
+
+    tools {
+      maven 'maven'
     }
-    options {
-        timeout(time: 1, unit: 'HOURS')
-        buildDiscarder(logRotator(numToKeepStr: '4')) 
-    }
-    parameters {
-        string(name: 'Branch', defaultValue: 'sonartest', description: 'GitHub Branch Name')
-        string(name: 'ImageName', defaultValue: 'sample', description: 'Provide Docker Image Name')
-        string(name: 'ImageTag', defaultValue: 'latest', description: 'Docker ImageTag')
-    }
+    
     environment {
-       SCANNER_HOME=tool 'sonar-scanner'
+        DOCKER_CREDS = credentials('dockercreds')
+        SCANNER_HOME = tool 'sonar-scanner'
     }
     stages {
-      stage("App Code Checkout"){
-        steps{ 
-          git branch: "${params.Branch}", url:'https://github.com/prateekkumawat/jenkins-weekend-repo.git'
-        }
-      }  
-      stage('Sonar Analysis') { 
-        steps {
-          dir('app/'){
-            withSonarQubeEnv('sonar-server'){
-                sh ''' $SCANNER_HOME/bin/sonar-scanner \
-                      -Dsonar.projectName=docker-spring-image-builder \
-                      -Dsonar.projectKey=docker-spring-image-builder '''
+        stage("Clean Workspace") { 
+            steps {
+                cleanWs()
             }
+        }
+
+        stage("AppCode Checkout"){
+            steps{
+                git branch:"nexus", url:"https://github.com/prateekkumawat/jenkins-weekend-repo.git"
+            }
+        }
+
+        stage("SonarAnalysis"){
+            steps{
+                dir('springapp/'){
+                    withSonarQubeEnv('sonar-server') {
+                      sh ''' mvn clean verify sonar:sonar \
+                      -Dsonar.projectName=springapp-learning-basic \
+                      -Dsonar.projectKey=springapp-learning-basic '''
+                    }
+                }     
+            }
+        }   
+
+        stage("Sonar QualityGate"){
+            steps{
+                script {
+                  waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
+                }
+            }
+        }
+        
+        stage("Artifacts Upload"){
+            steps{
+                nexusArtifactUploader (
+                    nexusVersion: 'nexus3',
+                    protocol: 'http',
+                    nexusUrl: 'http://13.233.125.54:8081/repository/maven-releases/',
+                    groupId: 'com.example',
+                    version: 0.0.2-SNAPSHOT,
+                    repository: 'nexus-releases',
+                    credentialsId: 'nexus',
+                    artifacts: [
+                        [artifactId: demo,
+                        classifier: '',
+                        file: 'demo' + version + '.jar',
+                        type: 'jar']
+                    ]    
+                )    
+            }
+        }
+
+        stage("Build Image") {
+            steps {
+               sh 'docker build -t prateekkumawat/jenkinsimage:springapp-${BUILD_NUMBER} . '
+            }
+        }
+        
+        stage("push Image"){
+          steps {
+               sh 'docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW '
+               sh ' docker push prateekkumawat/jenkinsimage:springapp-${BUILD_NUMBER} '
           }
         }
-      }
-      stage('Quality gate') {
-        steps {
-          script {
-            waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
-          }
+
+        stage("Notification"){
+            steps {
+                sh ' echo " Hello slack notification msg send" '
+            }
         }
-      }
-      stage("Build Docker Image") {
-        steps {
-            sh "docker build -t ${params.ImageName}:${params.ImageTag} . " 
-        }  
-      }
-      stage("Vanulabtites Security Scanning"){
-        steps {
-            sh " trivy -q image ${params.ImageName}:${params.ImageTag} >> /tmp/triyscan.txt"
-        }
-      }
     }
 }
