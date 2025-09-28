@@ -2,15 +2,13 @@ pipeline {
     agent {
         label 'build'
     } 
-
-    tools {
-      maven 'maven'
-    }
-    
+ 
     environment {
         DOCKER_CREDS = credentials('dockercreds')
         SCANNER_HOME = tool 'sonar-scanner'
+        NEXUSURL_HOST = "43.205.253.18:8081"
     }
+   
     stages {
         stage("Clean Workspace") { 
             steps {
@@ -20,17 +18,17 @@ pipeline {
 
         stage("AppCode Checkout"){
             steps{
-                git branch:"nexus", url:"https://github.com/prateekkumawat/jenkins-weekend-repo.git"
+                git branch:"nexusrelease", url:"https://github.com/prateekkumawat/jenkins-weekend-repo.git"
             }
         }
 
         stage("SonarAnalysis"){
             steps{
-                dir('springapp/'){
+                dir('app/'){
                     withSonarQubeEnv('sonar-server') {
-                      sh ''' mvn clean verify sonar:sonar \
-                      -Dsonar.projectName=springapp-learning-basic \
-                      -Dsonar.projectKey=springapp-learning-basic '''
+                      sh ''' $SCANNER_HOME/bin/sonar-scanner \
+                      -Dsonar.projectName=python-release-nexus \
+                      -Dsonar.projectKey=python-release-nexus '''
                     }
                 }     
             }
@@ -44,47 +42,73 @@ pipeline {
             }
         }
         
-         stage("MavenBuild"){
+         stage("PythonBuild"){
             steps{
-                dir('springapp/'){
-                    sh 'mvn clean package'
-                }
+                dir('app/'){
+                  sh '''
+                    python3 -m venv venv
+                    source venv/bin/activate
+                    pip install --upgrade pip setuptools wheel build
+                    python -m build
+                    '''
 
+                    // Dynamically get package name and version
+                    script {
+                        env.PACKAGE_NAME = sh(script: "python3 setup.py --name", returnStdout: true).trim()
+                        env.PACKAGE_VERSION = sh(script: "python3 setup.py --version", returnStdout: true).trim()
+                        def distFiles = sh(script: "ls -1 dist/", returnStdout: true).trim().split("\n")
+                        
+                        // Pick the wheel and tar.gz files
+                        env.WHL_FILE = distFiles.find { it.endsWith(".whl") } ?: ""
+                        env.TAR_FILE = distFiles.find { it.endsWith(".tar.gz") } ?: ""
+                        
+                        echo "Detected Package: ${env.PACKAGE_NAME}, Version: ${env.PACKAGE_VERSION}"
+                        echo "Distfiles WHL: ${env.WHL_FILE}, TAR: ${env.TAR_FILE}"
+                    }
+                }    
             }
         }
 
         stage("Artifacts Upload"){
             steps{
-                dir('springapp/'){
-                    nexusArtifactUploader (
-                        nexusVersion: 'nexus3',
-                        protocol: 'http',
-                        nexusUrl: '13.233.125.54:8081',
-                        groupId: 'com.example',
-                        version: '0.0.3-SNAPSHOT',
-                        repository: 'maven-snapshots',
-                        credentialsId: 'nexus',
-                        artifacts: [
-                            [artifactId: 'demo',
+                dir('app/'){
+                    nexusArtifactUploader(
+                    nexusVersion: 'nexus3',
+                    protocol: 'http',
+                    nexusUrl: "${env.NEXUSURL_HOST}",
+                    groupId: 'highskyapp',
+                    version: "${env.PACKAGE_VERSION}",
+                    repository: 'python-release',       // use a PyPI-like repo in Nexus
+                    credentialsId: 'nexus',
+                    artifacts: [
+                        [
+                            artifactId: "",
                             classifier: '',
-                            file: "target/demo-0.0.3-SNAPSHOT.jar",
-                            type: 'jar']
-                        ]    
-                    )
+                            file: "dist/${env.WHL_FILE}",
+                            type: 'whl'
+                        ],
+                        [
+                            artifactId: "",
+                            classifier: '',
+                            file: "dist/${env.TAR_FILE}",
+                            type: 'tar.gz'
+                        ]
+                    ]
+                   )
                 }        
             }
         }
 
         stage("Build Image") {
             steps {
-               sh 'docker build -t prateekkumawat/jenkinsimage:springapp-${BUILD_NUMBER} . '
+               sh 'docker build -t prateekkumawat/jenkinsimage:highskyapp-${BUILD_NUMBER} . '
             }
         }
         
         stage("push Image"){
           steps {
                sh 'docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW '
-               sh ' docker push prateekkumawat/jenkinsimage:springapp-${BUILD_NUMBER} '
+               sh ' docker push prateekkumawat/jenkinsimage:highskyapp-${BUILD_NUMBER} '
           }
         }
 
