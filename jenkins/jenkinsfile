@@ -6,7 +6,7 @@ pipeline {
     environment {
         DOCKER_CREDS = credentials('dockercreds')
         SCANNER_HOME = tool 'sonar-scanner'
-        NEXUSURL_HOST = "43.205.253.18:8081"
+        NEXUSURL_HOST = "43.205.233.21:8081"
     }
    
     stages {
@@ -41,8 +41,14 @@ pipeline {
                 }
             }
         }
-        
-         stage("PythonBuild"){
+
+        stage("TrivyFS Scan"){
+          steps{
+            sh ' trivy fs app > /tmp/fs_code_report.txt '   
+          }
+        }
+
+        stage("PythonBuild"){
             steps{
                 dir('app/'){
                   sh '''
@@ -109,6 +115,12 @@ pipeline {
           steps {
                sh 'docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW '
                sh ' docker push prateekkumawat/jenkinsimage:highskyapp-${BUILD_NUMBER} '
+          }
+        }
+
+        stage("Trivy Scan"){ 
+          steps {
+             sh 'trivy image prateekkumawat/jenkinsimage:highskyapp-${BUILD_NUMBER} > /tmp/highskyapp-${BUILD_NUMBER}'
           }
         }
 
