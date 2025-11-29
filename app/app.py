@@ -113,7 +113,6 @@ def delete_user(user_id):
     db.session.commit()
     return jsonify({"message": f"User {user_id} deleted"}), 200
 
-
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
