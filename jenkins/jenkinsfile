@@ -9,7 +9,7 @@ pipeline {
     environment {
         DOCKER_CREDS = credentials('dockercreds')
         SCANNER_HOME = tool 'sonar-scanner'
-        NEXUSURL_HOST = "3.110.33.25:8081"
+        NEXUSURL_HOST = "13.233.206.114:8081"
     }
    
     stages {
@@ -30,8 +30,8 @@ pipeline {
                 dir('app/'){
                     withSonarQubeEnv('sonar-server') {
                       sh ''' $SCANNER_HOME/bin/sonar-scanner \
-                      -Dsonar.projectName=python-release-nexus \
-                      -Dsonar.projectKey=python-release-nexus '''
+                      -Dsonar.projectName=pyapp-tag-release \
+                      -Dsonar.projectKey=pyapp-tag-release '''
                     }
                 }     
             }
@@ -88,7 +88,7 @@ pipeline {
                     groupId: 'highskyapp',
                     version: "${env.PACKAGE_VERSION}",
                     repository: 'python-release',       // use a PyPI-like repo in Nexus
-                    credentialsId: 'nexus',
+                    credentialsId: 'nexus-creds',
                     artifacts: [
                         [
                             artifactId: "",
