@@ -7,7 +7,7 @@ pipeline {
          string(name: 'GIT_REF', defaultValue: 'main', description: 'Branch or Tags')
     }
     environment {
-        DOCKER_CREDS = credentials('dockercreds')
+        DOCKER_CREDS = credentials('docker-creds')
         SCANNER_HOME = tool 'sonar-scanner'
         NEXUSURL_HOST = "13.233.206.114:8081"
     }
