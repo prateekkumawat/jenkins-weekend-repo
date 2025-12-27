@@ -22,7 +22,7 @@ pipeline {
         stage("AppCode Checkout"){
             steps{
                 checkout([$class: 'GitSCM',
-                            branches: [[name: isTag ? "refs/tags/${params.GIT_REF}" : ${GIT_REF}]],
+                            branches: [[name: params.GIT_REF]],
                             userRemoteConfigs: [[ url: "https://github.com/prateekkumawat/jenkins-weekend-repo.git" ]]
                             ])
             }
