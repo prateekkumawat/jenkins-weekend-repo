@@ -131,33 +131,33 @@ pipeline {
           }
         }
 
-        stage("Notification"){
+        stage("Notification") {
             steps {
-               def sendTeamsNotification(status, message) {
+                script {
                     withCredentials([string(credentialsId: 'TEAMS_WEBHOOK', variable: 'WEBHOOK_URL')]) {
                         sh """
                         curl -H 'Content-Type: application/json' \
                         -d '{
-                            "@type": "MessageCard",
-                            "@context": "http://schema.org/extensions",
-                            "summary": "Jenkins Build",
-                            "themeColor": "${status == 'SUCCESS' ? '00FF00' : 'FF0000'}",
-                            "title": "Jenkins Job: ${env.JOB_NAME}",
-                            "sections": [{
-                                "facts": [
-                                    {"name": "Status", "value": "${status}"},
-                                    {"name": "Build", "value": "#${env.BUILD_NUMBER}"},
-                                    {"name": "Branch/Tag", "value": "${env.GIT_BRANCH ?: params.GIT_REF}"},
-                                    {"name": "URL", "value": "${env.BUILD_URL}"}
-                                ],
-                                "text": "${message}"
-                            }]
-                            }' \
-                        $WEBHOOK_URL
+                        "@type": "MessageCard",
+                        "@context": "http://schema.org/extensions",
+                        "summary": "Jenkins Build",
+                        "themeColor": "00FF00",
+                        "title": "Jenkins Job: ${env.JOB_NAME}",
+                        "sections": [{
+                            "facts": [
+                            {"name": "Status", "value": "SUCCESS"},
+                            {"name": "Build", "value": "#${env.BUILD_NUMBER}"},
+                            {"name": "URL", "value": "${env.BUILD_URL}"}
+                            ],
+                            "text": "Build completed"
+                        }]
+                        }' \
+                        \$WEBHOOK_URL
                         """
                     }
                 }
             }
         }
+
     }
 }
