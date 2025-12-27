@@ -9,7 +9,7 @@ pipeline {
     environment {
         DOCKER_CREDS = credentials('docker-creds')
         SCANNER_HOME = tool 'sonar-scanner'
-        NEXUSURL_HOST = "13.233.206.114:8081"
+        NEXUSURL_HOST = "35.154.169.133:8081"
     }
    
     stages {
@@ -21,7 +21,10 @@ pipeline {
 
         stage("AppCode Checkout"){
             steps{
-                git branch: params.GIT_REF, url:"https://github.com/prateekkumawat/jenkins-weekend-repo.git"
+                checkout([$class: 'GitSCM',
+                            branches: [[name: isTag ? "refs/tags/${params.GIT_REF}" : ${GIT_REF}]],
+                            userRemoteConfigs: [[ url: "https://github.com/prateekkumawat/jenkins-weekend-repo.git" ]]
+                            ])
             }
         }
 
