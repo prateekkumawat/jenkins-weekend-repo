@@ -145,11 +145,12 @@ pipeline {
                         "title": "Jenkins Job: ${env.JOB_NAME}",
                         "sections": [{
                             "facts": [
-                            {"name": "Status", "value": "SUCCESS"},
-                            {"name": "Build", "value": "#${env.BUILD_NUMBER}"},
-                            {"name": "URL", "value": "${env.BUILD_URL}"}
+                                { "name": "🟢 **Status**", "value": "**SUCCESS ✅**" },
+                                { "name": "🔢 **Build**", "value": "**#${env.BUILD_NUMBER}**" },
+                                { "name": "🌿 **Branch / Tag**", "value": "**${env.GIT_BRANCH ?: params.GIT_REF}**" },
+                                { "name": "🔗 **Build URL**", "value": "[**Open Build**](${env.BUILD_URL})" }
                             ],
-                            "text": "Build completed"
+                            "text": "🚀 **Build completed successfully!**"
                         }]
                         }' \
                         \$WEBHOOK_URL
