@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pythonapp
+  namespace: pythonapp
+  labels:
+    app: python-app
+spec:
+  selector:
+    matchLabels:
+      app: python-app
+  template:
+    metadata:
+      labels:
+        app: python-app
+    spec:
+      containers:
+      - name: pythonapp
+        image: prateekkumawat/jenkinsimage:pythonapp-rc-4.0.2
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits: 
+            memory: "800Mi"
+            cpu: "800m"
+        ports:
+        - containerPort: 5000
+        env: 
+        - name: MYSQL_HOST
+          value: mysql-svc.mysql.svc.cluster.local
+        - name: MYSQL_USER
+          value: appuser
+        - name: MYSQL_PASSWORD
+          value: redhat
+        - name: MYSQL_DB 
+          value: appdb 
