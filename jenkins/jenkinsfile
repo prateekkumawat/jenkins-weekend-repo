@@ -9,7 +9,7 @@ pipeline {
     environment {
         DOCKER_CREDS = credentials('docker-creds')
         SCANNER_HOME = tool 'sonar-scanner'
-        NEXUSURL_HOST = "35.154.169.133:8081"
+        NEXUSURL_HOST = "43.205.144.129:8081"
     }
    
     stages {
